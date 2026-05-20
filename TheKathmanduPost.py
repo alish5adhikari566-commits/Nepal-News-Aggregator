@@ -212,7 +212,7 @@ def parse_article(soup: BeautifulSoup) -> dict:
 def scrape(
     categories: dict = CATEGORIES,
     full_articles: bool = False,
-    output_file: str = "KathmanduPost.json",
+    output_file: str = "Kathmandu.json",
     pages: int = 1,
     headless: bool = True,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
@@ -309,7 +309,7 @@ if __name__ == "__main__":
                         help="Listing pages per category (default: 1)")
     parser.add_argument("--full", action="store_true",
                         help="Also scrape full article body (slow)")
-    parser.add_argument("--output", default="ekantipur_news.json",
+    parser.add_argument("--output", default="KathmanduPost.json",
                         help="Output JSON file")
     parser.add_argument("--no-headless", action="store_true",
                         help="Show browser window (good for debugging)")
@@ -326,3 +326,5 @@ if __name__ == "__main__":
         headless=not args.no_headless,
     )
     print_preview(articles, n=args.preview)
+
+    #python TheKathmanduPost.py --no-headless

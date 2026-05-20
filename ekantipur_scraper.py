@@ -327,3 +327,5 @@ if __name__ == "__main__":
         headless=not args.no_headless,
     )
     print_preview(articles, n=args.preview)
+
+    #python ekantipur_scraper.py --no-headless

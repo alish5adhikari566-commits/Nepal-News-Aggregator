@@ -295,7 +295,7 @@ if __name__ == "__main__":
                         help="Listing pages per category (default: 1)")
     parser.add_argument("--full", action="store_true",
                         help="Also scrape full article body (slow)")
-    parser.add_argument("--output", default="ekantipur_news.json",
+    parser.add_argument("--output", default="Aanapurna.json",
                         help="Output JSON file")
     parser.add_argument("--no-headless", action="store_true",
                         help="Show browser window (good for debugging)")
@@ -312,3 +312,6 @@ if __name__ == "__main__":
         headless=not args.no_headless,
     )
     print_preview(articles, n=args.preview)
+
+
+#python Aanapurna.py --no-headless

@@ -21,6 +21,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from database import init_db, save_article, print_preview, print_stats # type: ignore 
 
 try:
     from webdriver_manager.chrome import ChromeDriverManager
@@ -32,7 +33,7 @@ try:
     from fake_useragent import UserAgent
     ua = UserAgent()
     def get_ua(): # type: ignore
-        return ua.chrome  # always chrome-like to stay consistent
+        return ua.chrome  
 except ImportError:
     def get_ua():
         return (
@@ -214,9 +215,9 @@ def scrape(
     full_articles: bool = False,
     output_file: str = "Kathmandu.json",
     pages: int = 1,
-    headless: bool = True,
+    headless: bool = False,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
-
+    conn=init_db("TheKtmPost.db")
     print("=" * 55)
     print("  eKantipur Selenium Scraper")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -264,11 +265,12 @@ def scrape(
                         stub.update(detail)
                         human_delay(3, 6)
 
-                    all_articles.append(stub)
+                    save_article(conn,stub)
 
                 human_delay()
 
     finally:
+        conn.close()
         driver.quit()
 
     print(f"\n✓ Total unique articles: {len(all_articles)}")
@@ -325,6 +327,6 @@ if __name__ == "__main__":
         pages=args.pages,
         headless=not args.no_headless,
     )
-    print_preview(articles, n=args.preview)
+    print_stats()
 
     #python TheKathmanduPost.py --no-headless

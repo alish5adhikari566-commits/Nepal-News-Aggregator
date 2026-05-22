@@ -21,6 +21,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from database import init_db, save_article, print_preview, print_stats # type: ignore
 
 try:
     from webdriver_manager.chrome import ChromeDriverManager
@@ -215,9 +216,9 @@ def scrape(
     full_articles: bool = False,
     output_file: str = "ekantipur_news.json",
     pages: int = 1,
-    headless: bool = True,
+    headless: bool = False,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
-
+    conn=init_db("Article.db")
     print("=" * 55)
     print("  eKantipur Selenium Scraper")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -265,12 +266,13 @@ def scrape(
                         stub.update(detail)
                         human_delay(3, 6)
 
-                    all_articles.append(stub)
+                    save_article(conn, stub)
 
                 human_delay()
 
     finally:
         driver.quit()
+        conn.close()
 
     print(f"\n✓ Total unique articles: {len(all_articles)}")
     with open(output_file, "w", encoding="utf-8") as f:
@@ -316,16 +318,14 @@ if __name__ == "__main__":
                         help="Show browser window (good for debugging)")
     parser.add_argument("--preview", type=int, default=3)
     args = parser.parse_args()
-
     cats = {k: CATEGORIES[k] for k in args.categories} if args.categories else CATEGORIES
 
-    articles = scrape(
+    scrape(
         categories=cats,
         full_articles=args.full,
-        output_file=args.output,
         pages=args.pages,
         headless=not args.no_headless,
     )
-    print_preview(articles, n=args.preview)
+    print_stats()
 
     #python ekantipur_scraper.py --no-headless

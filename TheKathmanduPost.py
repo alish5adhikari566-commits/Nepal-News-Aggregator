@@ -1,14 +1,4 @@
-"""
-eKantipur News Scraper (Selenium)
------------------------------------
-Scrapes news articles from ekantipur.com using Selenium.
-Handles JS-rendered content.
-For personal/educational use only.
-
-Requirements:
-    pip install selenium beautifulsoup4 webdriver-manager fake-useragent
-"""
-
+#Dependiences
 import json
 import time
 import random
@@ -76,7 +66,7 @@ def make_driver(headless: bool = True) -> webdriver.Chrome:#settinh up the Brows
     opts.add_argument("--disable-blink-features=AutomationControlled")
     opts.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
     opts.add_experimental_option("useAutomationExtension", False)
-    opts.add_argument(f"--user-agent={get_ua()}")  # random UA on every driver launch
+    opts.add_argument(f"--user-agent={get_ua()}") 
 
     if USE_WDM:
         service = Service(ChromeDriverManager().install()) # type: ignore
@@ -92,7 +82,6 @@ def make_driver(headless: bool = True) -> webdriver.Chrome:#settinh up the Brows
 
 
 def rotate_ua(driver):#Randomly choses a fake user agent from an imported library 
-    """Hot-swap the user agent mid-session between categories."""
     new_ua = get_ua()
     driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": new_ua})
     print(f"  ↻ Rotated UA: {new_ua[:60]}...")
@@ -217,7 +206,7 @@ def scrape(
     pages: int = 1,
     headless: bool = False,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
-    conn=init_db("TheKtmPost.db")
+    conn=init_db("TheKtmPost.db") #initializing database
     print("=" * 55)
     print("  eKantipur Selenium Scraper")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

@@ -1,14 +1,4 @@
-"""
-eKantipur News Scraper (Selenium)
------------------------------------
-Scrapes news articles from ekantipur.com using Selenium.
-Handles JS-rendered content.
-For personal/educational use only.
-
-Requirements:
-    pip install selenium beautifulsoup4 webdriver-manager fake-useragent
-"""
-
+#Dependencies
 import json
 import time
 import random
@@ -85,7 +75,6 @@ def make_driver(headless: bool = True) -> webdriver.Chrome:
 
 
 def rotate_ua(driver):
-    """Hot-swap the user agent mid-session between categories."""
     new_ua = get_ua()
     driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": new_ua})
     print(f"  ↻ Rotated UA: {new_ua[:60]}...")
@@ -202,8 +191,8 @@ def scrape(
     output_file: str = "Aanapurna.json",
     pages: int = 1,
     headless: bool = False,
-) -> list[dict]:
-    conn=init_db("AnnapurnaArticle.db")
+) -> list[dict]:# The Main scraper that calls all the above functions 
+    conn=init_db("AnnapurnaArticle.db")# initialize database
     print("=" * 55)
     print("  eKantipur Selenium Scraper")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

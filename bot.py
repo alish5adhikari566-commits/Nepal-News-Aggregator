@@ -174,7 +174,7 @@ async def send_digest(context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Welcome message and setup prompt."""
-    chat_id = update.effective_chat.id
+    chat_id = update.effective_chat.id# type: ignore
     if chat_id not in USER_PREFS:
         USER_PREFS[chat_id] = {
             "time":       "9AM",
@@ -183,7 +183,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "sent":       set(),
         }
 
-    await update.message.reply_text(
+    await update.message.reply_text( # type: ignore
         "👋 Welcome to *Nepal News Bot!*\n\n"
         "I'll send you daily news from eKantipur, Kathmandu Post, and Annapurna Post.\n\n"
         "Use these commands to customize:\n"
@@ -204,7 +204,7 @@ async def set_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("12 PM", callback_data="time_12PM"),
         InlineKeyboardButton("6 PM",  callback_data="time_6PM"),
     ]]
-    await update.message.reply_text(
+    await update.message.reply_text(# type: ignore
         "🕐 When should I send your daily digest?",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -223,9 +223,9 @@ async def set_categories(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard.append(row)
     keyboard.append([InlineKeyboardButton("✅ Done", callback_data="cat_done")])
 
-    chat_id = update.effective_chat.id
+    chat_id = update.effective_chat.id# type: ignore
     current = USER_PREFS.get(chat_id, {}).get("categories", ["all"])
-    await update.message.reply_text(
+    await update.message.reply_text(# type: ignore
         f"📂 Choose categories (tap to toggle):\nCurrently: *{', '.join(current)}*\n\nTap a category to add/remove it, then tap Done.",
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown"
@@ -240,7 +240,7 @@ async def set_outlets(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]]
     keyboard.append([InlineKeyboardButton("✅ All Outlets", callback_data="outlet_all")])
 
-    await update.message.reply_text(
+    await update.message.reply_text(# type: ignore
         "📰 Which outlets do you want news from?",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
@@ -248,14 +248,14 @@ async def set_outlets(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def get_digest_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send digest immediately on demand."""
-    chat_id = update.effective_chat.id
+    chat_id = update.effective_chat.id# type: ignore
     prefs = USER_PREFS.get(chat_id, {
         "categories": ["all"],
         "outlets": list(OUTLETS.keys()),
         "sent": set(),
     })
 
-    await update.message.reply_text("⏳ Fetching latest news for you...")
+    await update.message.reply_text("⏳ Fetching latest news for you...")# type: ignore
 
     categories = prefs.get("categories", ["all"])
     outlets    = prefs.get("outlets", list(OUTLETS.keys()))
@@ -269,7 +269,7 @@ async def get_digest_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if message:
             found_any = True
-            await update.message.reply_text(
+            await update.message.reply_text(# type: ignore
                 message,
                 parse_mode="Markdown",
                 disable_web_page_preview=True,
@@ -279,19 +279,19 @@ async def get_digest_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
         USER_PREFS[chat_id]["sent"] = sent_links
 
     if not found_any:
-        await update.message.reply_text("No new articles found in the last 24 hours.")
+        await update.message.reply_text("No new articles found in the last 24 hours.")# type: ignore
 
 
 async def show_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Show current user settings."""
-    chat_id = update.effective_chat.id
+    chat_id = update.effective_chat.id# type: ignore
     prefs = USER_PREFS.get(chat_id, {})
 
     time_val = prefs.get("time", "9AM")
     cats     = ", ".join(prefs.get("categories", ["all"]))
     outlets  = ", ".join([OUTLET_LABELS[o] for o in prefs.get("outlets", list(OUTLETS.keys()))])
 
-    await update.message.reply_text(
+    await update.message.reply_text(# type: ignore
         f"⚙️ *Your Settings*\n\n"
         f"🕐 Time: *{time_val}*\n"
         f"📂 Categories: *{cats}*\n"
@@ -305,10 +305,10 @@ async def show_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle all inline keyboard button presses."""
     query   = update.callback_query
-    chat_id = query.message.chat_id
-    data    = query.data
+    chat_id = query.message.chat_id# type: ignore
+    data    = query.data# type: ignore
 
-    await query.answer()
+    await query.answer()# type: ignore
 
     if chat_id not in USER_PREFS:
         USER_PREFS[chat_id] = {
@@ -317,22 +317,22 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
     # ── Time selection ──
-    if data.startswith("time_"):
-        selected = data.replace("time_", "")
+    if data.startswith("time_"):# type: ignore
+        selected = data.replace("time_", "")# type: ignore
         USER_PREFS[chat_id]["time"] = selected
-        await query.edit_message_text(f"✅ Delivery time set to *{selected}*", parse_mode="Markdown")
+        await query.edit_message_text(f"✅ Delivery time set to *{selected}*", parse_mode="Markdown")# type: ignore
 
     # ── Category toggle ──
-    elif data.startswith("cat_"):
-        cat = data.replace("cat_", "")
+    elif data.startswith("cat_"):# type: ignore
+        cat = data.replace("cat_", "")# type: ignore
         if cat == "done":
             current = USER_PREFS[chat_id]["categories"]
-            await query.edit_message_text(
+            await query.edit_message_text(# type: ignore
                 f"✅ Categories saved: *{', '.join(current)}*", parse_mode="Markdown"
             )
         elif cat == "all":
             USER_PREFS[chat_id]["categories"] = ["all"]
-            await query.edit_message_text("✅ Set to *all categories*", parse_mode="Markdown")
+            await query.edit_message_text("✅ Set to *all categories*", parse_mode="Markdown")# type: ignore
         else:
             current = USER_PREFS[chat_id]["categories"]
             if "all" in current:
@@ -344,18 +344,18 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not current:
                 current = ["all"]
             USER_PREFS[chat_id]["categories"] = current
-            await query.edit_message_text(
+            await query.edit_message_text(# type: ignore
                 f"📂 Selected: *{', '.join(current)}*\n\nTap more or press Done.",
                 parse_mode="Markdown",
-                reply_markup=query.message.reply_markup
+                reply_markup=query.message.reply_markup# type: ignore
             )
 
     # ── Outlet selection ──
-    elif data.startswith("outlet_"):
-        outlet = data.replace("outlet_", "")
+    elif data.startswith("outlet_"):# type: ignore
+        outlet = data.replace("outlet_", "")# type: ignore
         if outlet == "all":
             USER_PREFS[chat_id]["outlets"] = list(OUTLETS.keys())
-            await query.edit_message_text("✅ Subscribed to *all outlets*", parse_mode="Markdown")
+            await query.edit_message_text("✅ Subscribed to *all outlets*", parse_mode="Markdown")# type: ignore
         else:
             current = USER_PREFS[chat_id]["outlets"]
             if outlet in current:
@@ -366,7 +366,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 current = list(OUTLETS.keys())
             USER_PREFS[chat_id]["outlets"] = current
             labels = [OUTLET_LABELS[o] for o in current]
-            await query.edit_message_text(
+            await query.edit_message_text(# type: ignore
                 f"✅ Outlets: *{', '.join(labels)}*", parse_mode="Markdown"
             )
 
@@ -389,7 +389,7 @@ def main():
     app.add_handler(CallbackQueryHandler(handle_callback))
 
     # Schedule digest job — runs every hour, checks if it's time to send
-    app.job_queue.run_repeating(send_digest, interval=3600, first=10)
+    app.job_queue.run_repeating(send_digest, interval=3600, first=10)# type: ignore
 
     print("🤖 Bot is running...")
     app.run_polling()

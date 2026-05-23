@@ -1,5 +1,4 @@
 #dependencies
-import json
 import time
 import random
 from datetime import datetime
@@ -11,7 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from database import init_db, save_article, print_preview, print_stats # type: ignore
+from database import init_db, save_article,  print_stats # type: ignore
 
 try:
     from webdriver_manager.chrome import ChromeDriverManager
@@ -38,14 +37,14 @@ except ImportError:
 BASE_URL = "https://ekantipur.com"
 
 CATEGORIES = {
-    "business":      "/business",
     "politics":      "/politics",
-    "feature":       "/feature",
-    "world":         "/world",
+    "business":      "/business",   
+    "opinion":       "/opinion",
     "sports":        "/sports",
     "entertainment": "/entertainment",
-    "opinion":       "/opinion",
     "interview":     "/interview",
+    "feature":       "/feature",
+    "world":         "/world",
 }
 
 
@@ -55,7 +54,7 @@ def human_delay(min_s=3.0, max_s=7.0): # Makes st so that a random second from 3
 
 # ── Driver setup ─────────────────────────────────────────────────────────────
 
-def make_driver(headless: bool = True) -> webdriver.Chrome:#settinh up the Browser enviroment
+def make_driver(headless: bool = False) -> webdriver.Chrome:#settinh up the Browser enviroment
     opts = Options()
     if headless:
         opts.add_argument("--headless=new")
@@ -122,14 +121,7 @@ def parse_listing(soup: BeautifulSoup, category: str) -> list[dict]:# The main s
     articles = []
 
     cards = (
-        soup.select(".category-description") or
-        soup.select("article") or
-        soup.select(".news-list li") or
-        soup.select(".article-list .item") or
-        soup.select(".news-item") or
-        soup.select(".story") or
-        soup.select("div[class*='article']") or
-        soup.select("div[class*='news']")
+        soup.select(".category-inner-wrapper") 
     )
 
     print(f"    Raw cards found: {len(cards)}")
@@ -145,31 +137,22 @@ def parse_listing(soup: BeautifulSoup, category: str) -> list[dict]:# The main s
         if not link.startswith("http"):
             link = BASE_URL + link
 
-        title_tag = card.select_one("h1, h2, h3, h4, .title, .headline")
+        title_tag = card.select_one("h1, h2, h3, h4")
         title = title_tag.get_text(strip=True) if title_tag else a_tag.get_text(strip=True)
         if not title:
             continue
 
-        summary_tag = card.select_one("p, .summary, .excerpt, .lead, .description")
+        summary_tag = next(
+         (p for p in card.select("p") if not p.find("a")),
+         None
+        )
         summary = summary_tag.get_text(strip=True) if summary_tag else ""
 
-        date_tag = card.select_one("time, .date, .published, .post-date, .time")
-        date = ""
-        if date_tag:
-            date = date_tag.get("datetime", "") or date_tag.get_text(strip=True)
-
-        img_tag = card.select_one("img")
-        image = ""
-        if img_tag:
-            image = (img_tag.get("src") or img_tag.get("data-src")
-                     or img_tag.get("data-lazy-src") or "")
 
         articles.append({
             "title":    title,
             "link":     link,
             "summary":  summary,
-            "date":     date,
-            "image":    image,
             "category": category,
         })
 
@@ -203,7 +186,6 @@ def parse_article(soup: BeautifulSoup) -> dict:
 def scrape(
     categories: dict = CATEGORIES,
     full_articles: bool = False,
-    output_file: str = "ekantipur_news.json",
     pages: int = 1,
     headless: bool = False,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
@@ -264,29 +246,9 @@ def scrape(
         conn.close()
 
     print(f"\n✓ Total unique articles: {len(all_articles)}")
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(all_articles, f, ensure_ascii=False, indent=2)
-    print(f"✓ Saved to: {output_file}")
+ 
 
     return all_articles
-
-
-def print_preview(articles: list[dict], n: int = 3):#Just prints a sample of scraped articles to the terminal so you can quickly check if it worked without opening the JSON file.
-    from collections import defaultdict
-    by_cat = defaultdict(list)
-    for a in articles:
-        by_cat[a["category"]].append(a)
-
-    print("\n" + "=" * 55)
-    print("  PREVIEW")
-    print("=" * 55)
-    for cat, items in by_cat.items():
-        print(f"\n── {cat.upper()} ({len(items)} total) ──")
-        for item in items[:n]:
-            print(f"  {item['title']}")
-            print(f"  {item['link']}")
-            if item.get("date"):
-                print(f"  {item['date']}")
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────

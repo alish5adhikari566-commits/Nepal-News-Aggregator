@@ -1,5 +1,4 @@
 #Dependencies
-import json
 import time
 import random
 from datetime import datetime
@@ -11,7 +10,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from database import init_db, save_article, print_preview, print_stats # pyright: ignore[reportAssignmentType]
+from database import init_db, save_article, print_stats # pyright: ignore[reportAssignmentType]
 
 try:
     from webdriver_manager.chrome import ChromeDriverManager
@@ -49,18 +48,6 @@ def human_delay(min_s=3.0, max_s=7.0):
 
 def make_driver(headless: bool = True) -> webdriver.Chrome:
     opts = Options()
-    if headless:
-        opts.add_argument("--headless=new")
-    opts.add_argument("--no-sandbox")
-    opts.add_argument("--disable-dev-shm-usage")
-    opts.add_argument("--disable-gpu")
-    opts.add_argument("--window-size=1920,1080")
-    opts.add_argument("--lang=ne-NP")
-    opts.add_argument("--disable-blink-features=AutomationControlled")
-    opts.add_experimental_option("excludeSwitches", ["enable-automation", "enable-logging"])
-    opts.add_experimental_option("useAutomationExtension", False)
-    opts.add_argument(f"--user-agent={get_ua()}")  # random UA on every driver launch
-
     if USE_WDM:
         service = Service(ChromeDriverManager().install()) # type: ignore
         driver = webdriver.Chrome(service=service, options=opts)
@@ -130,31 +117,14 @@ def parse_listing(soup: BeautifulSoup, category: str) -> list[dict]:
         if not link.startswith("http"):
             link = BASE_URL + link
 
-        title_tag = card.select_one("h1, h2, h3, h4, .title, .headline")
+        title_tag = card.select_one( "h3")
         title = title_tag.get_text(strip=True) if title_tag else a_tag.get_text(strip=True)
         if not title:
             continue
 
-        summary_tag = card.select_one("p, .summary, .excerpt, .lead, .description")
-        summary = summary_tag.get_text(strip=True) if summary_tag else ""
-
-        date_tag = card.select_one("time, .date, .published, .post-date, .time")
-        date = ""
-        if date_tag:
-            date = date_tag.get("datetime", "") or date_tag.get_text(strip=True)
-
-        img_tag = card.select_one("img")
-        image = ""
-        if img_tag:
-            image = (img_tag.get("src") or img_tag.get("data-src")
-                     or img_tag.get("data-lazy-src") or "")
-
         articles.append({
             "title":    title,
             "link":     link,
-            "summary":  summary,
-            "date":     date,
-            "image":    image,
             "category": category,
         })
 
@@ -188,7 +158,6 @@ def parse_article(soup: BeautifulSoup) -> dict:
 def scrape(
     categories: dict = CATEGORIES,
     full_articles: bool = False,
-    output_file: str = "Aanapurna.json",
     pages: int = 1,
     headless: bool = False,
 ) -> list[dict]:# The Main scraper that calls all the above functions 
@@ -249,9 +218,6 @@ def scrape(
         conn.close()
 
     print(f"\n✓ Total unique articles: {len(all_articles)}")
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(all_articles, f, ensure_ascii=False, indent=2)
-    print(f"✓ Saved to: {output_file}")
 
     return all_articles
 
@@ -298,11 +264,10 @@ if __name__ == "__main__":
     articles = scrape(
         categories=cats,
         full_articles=args.full,
-        output_file=args.output,
         pages=args.pages,
         headless=not args.no_headless,
     )
-    print_preview(articles, n=args.preview)
+    print_stats()
 
 
-#python Aanapurna.py --no-headless
+#python Annapurna.py --no-headless

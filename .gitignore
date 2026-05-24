@@ -3,6 +3,11 @@ TheKtmPostArticle.db
 KantipurArticle.db
 AnnapurnaArticle.db
 failsafe.db
+
+# data for telegram bot is ignored
+botdata.py
+
+
 #Self assesments and things to update
 PROBLEMS.txt
 tests.py

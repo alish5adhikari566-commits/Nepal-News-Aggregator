@@ -14,7 +14,6 @@ Setup:
 """
 
 import sqlite3
-import json
 import logging
 from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -22,6 +21,7 @@ from telegram.ext import (
     Application, CommandHandler, CallbackQueryHandler,
     ContextTypes, JobQueue
 )
+from botdata import token
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-BOT_TOKEN = "8666625250:AAGBSmDlmOFAHRIChm90AikhSwYlXgJBFEo"
+BOT_TOKEN = token
 
 # Database files per outlet
 OUTLETS = {
@@ -388,7 +388,7 @@ def main():
     # Inline button callbacks
     app.add_handler(CallbackQueryHandler(handle_callback))
 
-    # Schedule digest job — runs every hour, checks if it's time to send
+    # Schedule digest job—  runs every hour, checks if it's time to send
     app.job_queue.run_repeating(send_digest, interval=3600, first=10)# type: ignore
 
     print("🤖 Bot is running...")

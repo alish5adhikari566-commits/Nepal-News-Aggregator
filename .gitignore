@@ -1,7 +1,8 @@
 #db files are ignored
-TheKtmPost.db
-Article.db
+TheKtmPostArticle.db
+KantipurArticle.db
 AnnapurnaArticle.db
+failsafe.db
 #Self assesments and things to update
 PROBLEMS.txt
 tests.py

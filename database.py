@@ -1,18 +1,8 @@
-"""
-database.py
-------------
-Handles all SQLite database operations for the eKantipur scraper.
-Import this into your scraper and call the functions as needed.
-
-Usage in Scraper.py:
-    from database import init_db, save_article, print_preview, print_stats
-"""
-
 import json
 import sqlite3
 from datetime import datetime
 
-DB_FILE = "Article.db"
+DB_FILE = "failsafe.db"
 
 
 def init_db(db_file: str = DB_FILE) -> sqlite3.Connection:

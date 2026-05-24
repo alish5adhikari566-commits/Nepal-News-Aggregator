@@ -189,7 +189,7 @@ def scrape(
     pages: int = 1,
     headless: bool = False,
 ) -> list[dict]: # The main function thar calls all the above functions and runs the scraper
-    conn=init_db("Article.db") #initalizes database
+    conn=init_db("KantipurArticle.db") #initalizes database
     print("=" * 55)
     print("  eKantipur Selenium Scraper")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")

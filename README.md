@@ -1,3 +1,4 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 # 🇳🇵 Nepal News Aggregator
 
 A multi-outlet Nepali news scraper with a Telegram bot that delivers daily digests straight to your phone.

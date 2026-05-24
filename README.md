@@ -1,5 +1,5 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
-# 🇳🇵 Nepal News Aggregator
+#  Nepal News Aggregator
 
 A multi-outlet Nepali news scraper with a Telegram bot that delivers daily digests straight to your phone.
 
@@ -34,14 +34,14 @@ Covers **eKantipur**, **Kathmandu Post**, and **Annapurna Post** — scraped, st
 
 ```
 news-tracker/
-├── ekantipur_scraper.py     # eKantipur scraper
-├── TheKathmanduPost.py      # Kathmandu Post scraper
-├── Annapurna.py             # Annapurna Post scraper
-├── database.py              # SQLite DB setup and helpers
-├── bot.py                   # Telegram bot
-├── Article.db               # eKantipur database
-├── TheKtmPost.db            # Kathmandu Post database
-└── AnnapurnaArticle.db      # Annapurna database
+├── ekantipur_scraper.py            # Kantipur scraper
+├── TheKathmanduPost.py             # Kathmandu Post scraper
+├── AnnapurnaArticle.py             # Annapurna Post scraper
+├── database.py                     # SQLite DB setup and helpers
+├── bot.py                          # Telegram bot
+├── KantipurArticle.db              # eKantipur database
+├── TheKtmPostArticle.db            # Kathmandu Post database
+└── AnnapurnaArticle.db             # Annapurna database
 ```
 
 ---
@@ -51,7 +51,7 @@ news-tracker/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/alish5adhikari566-commits/News-Tracker.git
+git clone https://github.com/alish5adhikari566-commits/Nepal-News-Aggregator.git
 cd News-Tracker
 ```
 
@@ -92,6 +92,8 @@ Get a token from [@BotFather](https://t.me/botfather) on Telegram.
 python ekantipur_scraper.py --no-headless
 python TheKathmanduPost.py --no-headless
 python Annapurna.py --no-headless
+
+For some reason the code only works when ran manually so just do that
 
 # Scrape specific categories only
 python ekantipur_scraper.py --no-headless --categories politics sports
